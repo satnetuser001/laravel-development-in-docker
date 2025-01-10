@@ -1,0 +1,46 @@
+services:
+
+  composer:
+    build:
+      context: ./composer
+      dockerfile: Dockerfile
+    user: ${CUID:-0}:${CGID:-0}
+    container_name: composer
+    profiles:
+      - create-project
+      - delete-project
+    volumes:
+      - type: bind
+        source: .
+        target: /app
+    networks:
+      - laravel-development
+
+#  artisan:
+#    image: php
+#    container_name: artisan
+#    networks:
+#      - laravel-development
+
+#  nginx:
+#    image: nginx
+#    container_name: nginx
+#    networks:
+#      - laravel-development
+
+#  mysql:
+#    image: mysql
+#    container_name: mysql
+#    networks:
+#      - laravel-development
+
+#  phpmyadmin:
+#    image: phpmyadmin
+#    container_name: phpmyadmin
+#    networks:
+#      - laravel-development
+
+networks:
+  laravel-development:
+    name: laravel-development
+    driver: bridge
