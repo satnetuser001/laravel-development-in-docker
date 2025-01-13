@@ -22,11 +22,39 @@ services:
 #    networks:
 #      - laravel-development
 
-#  nginx:
-#    image: nginx
-#    container_name: nginx
-#    networks:
-#      - laravel-development
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: ./nginx/conf.d
+        target: /etc/nginx/conf.d
+    ports:
+      - "8080:80"
+    depends_on:
+      - php-fpm
+    networks:
+      - laravel-development
+
+  php-fpm:
+    build:
+      context: ./php-fpm
+      dockerfile: Dockerfile
+    user: ${CUID:-0}:${CGID:-0}
+    container_name: php-fpm
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: ./laravel-development
+        target: /app
+    depends_on:
+      composer:
+        condition: service_completed_successfully
+        # following requires docker version not lower than 2.20.0
+        required: false
+    networks:
+      - laravel-development
 
 #  mysql:
 #    image: mysql
