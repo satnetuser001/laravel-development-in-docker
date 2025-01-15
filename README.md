@@ -3,7 +3,9 @@ This is a development environment for the Laravel application in Docker containe
 #to-do: block-diagram of application ?
 
 System requirements:
-docker version not lower than 2.20.0
+linux kernel version 6.8.0-51-generic
+docker engine version 27.5.0
+docker compose version 2.32.3
 
 First of all, rename the root directory to the name of your project, this is important because docker will use this name when building images.
 
@@ -22,7 +24,7 @@ CUID=$(id -u) CGID=$(id -g) docker compose up composer -d
 
 If you need to delete all containers and network.
 The "laravel-development" directory will not be deleted and will remain unchanged.
-docker compose --profile delete-project down
+docker compose --profile delete-development-environment down
 
 Step 2
 to-do: describe development process

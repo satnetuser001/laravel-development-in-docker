@@ -1,14 +1,14 @@
 services:
 
   composer:
+    container_name: composer
     build:
       context: ./composer
       dockerfile: Dockerfile
     user: ${CUID:-0}:${CGID:-0}
-    container_name: composer
     profiles:
       - create-project
-      - delete-project
+      - delete-development-environment
     volumes:
       - type: bind
         source: .
@@ -23,50 +23,74 @@ services:
 #      - laravel-development
 
   nginx:
-    image: nginx:latest
     container_name: nginx
+    image: nginx:latest
     restart: unless-stopped
-    volumes:
-      - type: bind
-        source: ./nginx/conf.d
-        target: /etc/nginx/conf.d
     ports:
       - "8080:80"
     depends_on:
       - php-fpm
+    volumes:
+      - type: bind
+        source: ./nginx/conf.d
+        target: /etc/nginx/conf.d
     networks:
       - laravel-development
 
   php-fpm:
+    container_name: php-fpm
     build:
       context: ./php-fpm
       dockerfile: Dockerfile
     user: ${CUID:-0}:${CGID:-0}
-    container_name: php-fpm
     restart: unless-stopped
+    depends_on:
+      composer:
+        condition: service_completed_successfully
+        required: false
     volumes:
       - type: bind
         source: ./laravel-development
         target: /app
-    depends_on:
-      composer:
-        condition: service_completed_successfully
-        # following requires docker version not lower than 2.20.0
-        required: false
     networks:
       - laravel-development
 
-#  mysql:
-#    image: mysql
-#    container_name: mysql
-#    networks:
-#      - laravel-development
+  mysql:
+    container_name: mysql
+    image: mysql:latest
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql-root-password
+      MYSQL_DATABASE: laravel_database
+      TZ: ${TZ}
+    secrets:
+      - mysql-root-password
+    volumes:
+      - laravel-development-mysql-data:/var/lib/mysql
+    networks:
+      - laravel-development
 
-#  phpmyadmin:
-#    image: phpmyadmin
-#    container_name: phpmyadmin
-#    networks:
-#      - laravel-development
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: phpmyadmin:latest
+    restart: unless-stopped
+    ports:
+      - "8090:80"
+    environment:
+      PMA_HOST: mysql
+      TZ: ${TZ}
+    depends_on:
+      - mysql
+    networks:
+      - laravel-development
+
+secrets:
+  mysql-root-password:
+    file: ./secrets/mysql_root_password.txt
+
+volumes:
+  laravel-development-mysql-data:
+    name: laravel-development-mysql-data
 
 networks:
   laravel-development:
