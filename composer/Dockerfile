@@ -1,11 +1,13 @@
-# for correct container work, current host system user must be set in
-# compose.yaml, otherwise laravel-development directory owner will be root
+# For correct container work, current host system user must be set in
+# compose.yaml, otherwise laravel-development directory owner will be root.
+# Also, the time zone environment variable must be set to install
+# php without interactive questions in compose.yaml.
 
 # base docker image
 FROM ubuntu:latest
 
 # set environment variable time zone for php installing
-ENV TZ=Europe/Kyiv
+#ENV TZ=Europe/Kyiv
 
 # install PHP with xml sqlite3 extensions and composer
 RUN apt update && apt install -y \

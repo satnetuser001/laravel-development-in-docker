@@ -1,5 +1,5 @@
 # base docker image
-FROM php:8.3.15-fpm
+FROM php:8.3.15-cli
 
 # install PHP extensions for databases: pdo, pdo_mysql
 RUN docker-php-ext-install pdo pdo_mysql
@@ -7,5 +7,5 @@ RUN docker-php-ext-install pdo pdo_mysql
 # create a working directory in container
 WORKDIR /app
 
-# declare expose port
-EXPOSE 9000
+# infinite task to prevent container from stopping
+ENTRYPOINT ["sleep", "infinity"]

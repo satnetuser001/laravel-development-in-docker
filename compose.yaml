@@ -6,6 +6,8 @@ services:
       context: ./composer
       dockerfile: Dockerfile
     user: ${CUID:-0}:${CGID:-0}
+    environment:
+      TZ: ${TZ}
     profiles:
       - create-project
       - delete-development-environment
@@ -16,11 +18,23 @@ services:
     networks:
       - laravel-development
 
-#  artisan:
-#    image: php
-#    container_name: artisan
-#    networks:
-#      - laravel-development
+  artisan:
+    container_name: artisan
+    build:
+      context: ./artisan
+      dockerfile: Dockerfile
+    user: ${CUID:-0}:${CGID:-0}
+    restart: unless-stopped
+    depends_on:
+      composer:
+        condition: service_completed_successfully
+        required: false
+    volumes:
+      - type: bind
+        source: ./laravel-development
+        target: /app
+    networks:
+      - laravel-development
 
   nginx:
     container_name: nginx
@@ -61,7 +75,7 @@ services:
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql-root-password
-      MYSQL_DATABASE: laravel_database
+      MYSQL_DATABASE: laravel
       TZ: ${TZ}
     secrets:
       - mysql-root-password
