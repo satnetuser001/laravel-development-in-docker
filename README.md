@@ -1,6 +1,33 @@
 This is a development environment for the Laravel application with MySQL database in Docker containers.
 
-#to-do: block-diagram of application
+Block-diagram of application:
++-----------------+
+| request from    |
+| client browser  |
++-----------------+
+         |
+         V
++-----------------+
+| nginx container |       +------------+    +------------+
+| port 8080       |       | composer   |    | artisan    |
++-----------------+       | container  |    | container  |
+         |                +------------+    +------------+
+         V                          |             |
++-----------------+                 V             V
+| php-fpm         |              +-----------------------+
+| container       |------------->| "laravel-development" |
++-----------------+              | directory and         |
+   |                             | SQLite files          |
+   |   +----------------------+  | bind mounts           |
+   |   | phpmyadmin container |  +-----------------------+
+   |   | port 8090            |
+   |   +----------------------+
+   |        |
+   V        V           +--------------------------------+
++-----------------+     | "laravel" database             |
+| mysql           |---> | laravel-development-mysql-data |
+| container       |     | volumes                        |
++-----------------+     +--------------------------------+
 
 System requirements:
 linux kernel version 6.8.0-51-generic
