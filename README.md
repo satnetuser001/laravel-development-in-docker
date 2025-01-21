@@ -19,7 +19,7 @@ Block-diagram of application:
 | container       |------------->| "laravel-development" |
 +-----------------+              | directory and         |
    |                             | SQLite files          |
-   |   +----------------------+  | bind mounts           |
+   |   +----------------------+  | bind mount            |
    |   | phpmyadmin container |  +-----------------------+
    |   | port 8090            |
    |   +----------------------+
@@ -27,18 +27,20 @@ Block-diagram of application:
    V        V           +--------------------------------+
 +-----------------+     | "laravel" database             |
 | mysql           |---> | laravel-development-mysql-data |
-| container       |     | volumes                        |
+| container       |     | volume                         |
 +-----------------+     +--------------------------------+
 </pre>
 
 System requirements:
-linux kernel version 6.8.0-51-generic
-docker engine version 27.5.0
-docker compose version 2.32.3
+<br>linux kernel version 6.8.0-51-generic
+<br>docker engine version 27.5.0
+<br>docker compose version 2.32.3
 
 Step 1 - building development environment.
 
-First of all, rename the root directory to the name of your project, this is important because docker will use this name when building images.
+Pull this application from the GitHub repository:
+git clone https://github.com/satnetuser001/laravel-development-in-docker.git
+Rename the root directory "laravel-development-in-docker" to the name of your project, this is important because docker will use this name when building images.
 
 For mysql database, change the root password in the secrets/mysql_root_password.txt. Exclude "secrets" directory from git commits in .gitignore file.
 
@@ -61,13 +63,30 @@ docker compose --profile delete-development-environment down
 Step 2 - development process.
 
 Development directory is "laravel-development". Open this directory in your IDE to start development. To see the result open in the browser "localhost:8080".
-...
+To see the phpMyAdmin page open in the browser "localhost:8090". Use "root" for the Username and value from the file "secrets/mysql_root_password.txt" for the Password.
 
-To connect mysql database ...
-Migrate rollback and make ...
-To attach to the artisan container:
+Setting up a connection between Laravel and MySQL database. By default, Laravel comes with a SQLite database. So it needs to take several steps to replace the database.
+
+Attach to the artisan container:
 docker exec -it artisan bash
 Error in artisan container "I have no name!" is Ok, because attribute "user" in compose.yaml can't set the "name".
+
+In the artisan container make a rollback migration for the SQLite database:
+php artisan migrate:rollback
+
+In IDE edit .env file for MySQL database:
+<pre>
+DB_CONNECTION=mysql
+DB_HOST=mysql
+DB_PORT=3306
+DB_DATABASE=laravel
+DB_USERNAME=root
+DB_PASSWORD=1077
+</pre>
+Note: DB_PASSWORD must be value from the file "secrets/mysql_root_password.txt".
+
+In the artisan container make a migration for the MySQL database:
+php artisan migrate
 
 Step 3 - build an image from a finished project.
 will be ...
