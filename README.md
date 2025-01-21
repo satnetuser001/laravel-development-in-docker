@@ -1,6 +1,7 @@
 This is a development environment for the Laravel application with MySQL database in Docker containers.
 
 Block-diagram of application:
+<pre>
 +-----------------+
 | request from    |
 | client browser  |
@@ -28,6 +29,7 @@ Block-diagram of application:
 | mysql           |---> | laravel-development-mysql-data |
 | container       |     | volumes                        |
 +-----------------+     +--------------------------------+
+</pre>
 
 System requirements:
 linux kernel version 6.8.0-51-generic
