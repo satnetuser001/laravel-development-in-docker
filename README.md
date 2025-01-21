@@ -1,4 +1,4 @@
-This is a development environment for the Laravel application with MySQL database in Docker containers.
+This is a development environment for the Laravel application with MySQL database in Docker containers.<br>
 
 Block-diagram of application:
 <pre>
@@ -36,42 +36,42 @@ System requirements:
 <br>docker engine version 27.5.0
 <br>docker compose version 2.32.3
 
-Step 1 - building development environment.
+Step 1 - building development environment.<br>
 
-Pull this application from the GitHub repository:
+Pull this application from the GitHub repository:<br>
 git clone https://github.com/satnetuser001/laravel-development-in-docker.git
-Rename the root directory "laravel-development-in-docker" to the name of your project, this is important because docker will use this name when building images.
+<br>Rename the root directory "laravel-development-in-docker" to the name of your project, this is important because docker will use this name when building images.
 
 For mysql database, change the root password in the secrets/mysql_root_password.txt. Exclude "secrets" directory from git commits in .gitignore file.
 
-Up all development containers with composer create-project.
-This is the default behavior and should be used in all standard cases.
-!Warning! All data in "laravel-development" directory will be deleted and replaced with the new Laravel project! It's Ok if you create a new project.
+Up all development containers with composer create-project.<br>
+This is the default behavior and should be used in all standard cases.<br>
+!Warning! All data in "laravel-development" directory will be deleted and replaced with the new Laravel project! It's Ok if you create a new project.<br>
 CUID=$(id -u) CGID=$(id -g) docker compose --profile create-project up -d
 
-If you need up only development containers:
+If you need up only development containers:<br>
 CUID=$(id -u) CGID=$(id -g) docker compose up -d
 
-If you need up only composer container to create-project.
-!Warning! All data in "laravel-development" directory will be deleted and replaced with the new Laravel project! It's Ok if you create a new project.
+If you need up only composer container to create-project.<br>
+!Warning! All data in "laravel-development" directory will be deleted and replaced with the new Laravel project! It's Ok if you create a new project.<br>
 CUID=$(id -u) CGID=$(id -g) docker compose up composer -d
 
-If you need to delete the development environment: all containers and network.
-The "laravel-development" directory and volume with the laravel database will not be deleted and will remain unchanged.
+If you need to delete the development environment: all containers and network.<br>
+The "laravel-development" directory and volume with the laravel database will not be deleted and will remain unchanged.<br>
 docker compose --profile delete-development-environment down
 
 Step 2 - development process.
 
-Development directory is "laravel-development". Open this directory in your IDE to start development. To see the result open in the browser "localhost:8080".
+Development directory is "laravel-development". Open this directory in your IDE to start development. To see the result open in the browser "localhost:8080".<br>
 To see the phpMyAdmin page open in the browser "localhost:8090". Use "root" for the Username and value from the file "secrets/mysql_root_password.txt" for the Password.
 
 Setting up a connection between Laravel and MySQL database. By default, Laravel comes with a SQLite database. So it needs to take several steps to replace the database.
 
-Attach to the artisan container:
+Attach to the artisan container:<br>
 docker exec -it artisan bash
-Error in artisan container "I have no name!" is Ok, because attribute "user" in compose.yaml can't set the "name".
+<br>Error in artisan container "I have no name!" is Ok, because attribute "user" in compose.yaml can't set the "name".
 
-In the artisan container make a rollback migration for the SQLite database:
+In the artisan container make a rollback migration for the SQLite database:<br>
 php artisan migrate:rollback
 
 In IDE edit .env file for MySQL database:
@@ -85,12 +85,12 @@ DB_PASSWORD=1077
 </pre>
 Note: DB_PASSWORD must be value from the file "secrets/mysql_root_password.txt".
 
-In the artisan container make a migration for the MySQL database:
+In the artisan container make a migration for the MySQL database:<br>
 php artisan migrate
 
-Step 3 - build an image from a finished project.
+Step 3 - build an image from a finished project.<br>
 will be ...
 
-Other
-Restart php-fpm container after replacing index.php file:
+Other<br>
+Restart php-fpm container after replacing index.php file.<br>
 docker restart php-fpm
