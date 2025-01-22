@@ -1,4 +1,4 @@
-###This is a development environment for the Laravel application with MySQL database in Docker containers.
+### This is a development environment for the Laravel application with MySQL database in Docker containers.
 
 Block-diagram of application:
 <pre>
@@ -32,9 +32,9 @@ Block-diagram of application:
 </pre>
 
 System requirements:
-<br>linux kernel version 6.8.0-51-generic
-<br>docker engine version 27.5.0
-<br>docker compose version 2.32.3
+linux kernel version 6.8.0-51-generic  
+docker engine version 27.5.0  
+docker compose version 2.32.3  
 
 ### Step 1 - building development environment.
 
