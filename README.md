@@ -35,6 +35,7 @@ System requirements:
 linux kernel version 6.8.0-51-generic  
 docker engine version 27.5.0  
 docker compose version 2.32.3  
+unoccupied ports 8080 8090  
 
 ### Step 1 - building development environment.
 
@@ -44,11 +45,11 @@ git clone https://github.com/satnetuser001/laravel-development-in-docker.git
 ```
 Rename the root directory "laravel-development-in-docker" to the name of your project, this is important because docker will use this name when building images.
 
-For mysql database, change the root password in the secrets/mysql_root_password.txt. Exclude "secrets" directory from git commits in .gitignore file.
+For mysql database, change the root password in the file "secrets/mysql_root_password.txt". Exclude "secrets" directory from git commits in ".gitignore" file.
 
 Up all development containers with composer create-project.  
-This is the default behavior and should be used in all standard cases.  
-#### !Warning! All data in "laravel-development" directory will be deleted and replaced with the new Laravel project! It's Ok if you create a new project.  
+This is the default behavior and should be used in all standard cases.
+##### !Warning! All data in "laravel-development" directory will be deleted and replaced with the new Laravel project! It's Ok if you create a new project.  
 ```bash
 CUID=$(id -u) CGID=$(id -g) docker compose --profile create-project up -d
 ```
@@ -58,8 +59,8 @@ If you need up only development containers:
 CUID=$(id -u) CGID=$(id -g) docker compose up -d
 ```
 
-If you need up only composer container to create-project.  
-#### !Warning! All data in "laravel-development" directory will be deleted and replaced with the new Laravel project! It's Ok if you create a new project.  
+If you need up only composer container to create-project.
+##### !Warning! All data in "laravel-development" directory will be deleted and replaced with the new Laravel project! It's Ok if you create a new project.  
 ```bash
 CUID=$(id -u) CGID=$(id -g) docker compose up composer -d
 ```
@@ -81,7 +82,7 @@ Attach to the artisan container:
 ```bash
 docker exec -it artisan bash
 ```
-Error in artisan container "I have no name!" is Ok, because attribute "user" in compose.yaml can't set the "name".
+Error in artisan container "I have no name!" is Ok, because attribute "user" in compose.yaml can't set the "name" from your host.
 
 In the artisan container make a rollback migration for the SQLite database:  
 ```php
@@ -107,10 +108,11 @@ php artisan migrate
 ### Step 3 - build an image from a finished project.  
 will be ...
 
-### Other  
+#### Other  
 Restart php-fpm container after replacing index.php file.  
 ```bash
 docker restart php-fpm
 ```
 
 CUID=$(id -u) CGID=$(id -g) - describe what is this?
+Composer image not used because ...
