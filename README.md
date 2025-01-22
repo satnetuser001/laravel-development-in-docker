@@ -1,4 +1,4 @@
-This is a development environment for the Laravel application with MySQL database in Docker containers.<br>
+###This is a development environment for the Laravel application with MySQL database in Docker containers.
 
 Block-diagram of application:
 <pre>
@@ -36,11 +36,13 @@ System requirements:
 <br>docker engine version 27.5.0
 <br>docker compose version 2.32.3
 
-Step 1 - building development environment.<br>
+### Step 1 - building development environment.
 
-Pull this application from the GitHub repository:<br>
+Pull this application from the GitHub repository:
+```bash
 git clone https://github.com/satnetuser001/laravel-development-in-docker.git
-<br>Rename the root directory "laravel-development-in-docker" to the name of your project, this is important because docker will use this name when building images.
+```
+Rename the root directory "laravel-development-in-docker" to the name of your project, this is important because docker will use this name when building images.
 
 For mysql database, change the root password in the secrets/mysql_root_password.txt. Exclude "secrets" directory from git commits in .gitignore file.
 
@@ -65,7 +67,7 @@ Step 2 - development process.
 Development directory is "laravel-development". Open this directory in your IDE to start development. To see the result open in the browser "localhost:8080".<br>
 To see the phpMyAdmin page open in the browser "localhost:8090". Use "root" for the Username and value from the file "secrets/mysql_root_password.txt" for the Password.
 
-Setting up a connection between Laravel and MySQL database. By default, Laravel comes with a SQLite database. So it needs to take several steps to replace the database.
+Setting up a connection between Laravel and MySQL database. By default, Laravel comes with a SQLite database. So it needs to take several next steps to replace the database.
 
 Attach to the artisan container:<br>
 docker exec -it artisan bash
@@ -94,3 +96,5 @@ will be ...
 Other<br>
 Restart php-fpm container after replacing index.php file.<br>
 docker restart php-fpm
+
+CUID=$(id -u) CGID=$(id -g) - describe what is this?
