@@ -73,8 +73,8 @@ docker compose --profile delete-development-environment down
 
 ### Step 2 - development process.
 
-Development directory is "laravel-development". Open this directory in your IDE to start development. To see the result open in the browser [localhost:8080](localhost:8080).  
-To see the phpMyAdmin page open in the browser [localhost:8090](localhost:8090). Use "root" for the Username and value from the file "secrets/mysql_root_password.txt" for the Password.
+Development directory is "laravel-development". Open this directory in your IDE to start development. To see the result open in the browser [localhost:8080](http://localhost:8080).  
+To see the phpMyAdmin page open in the browser [localhost:8090](http://localhost:8090). Use "root" for the Username and value from the file "secrets/mysql_root_password.txt" for the Password.
 
 Setting up a connection between Laravel and MySQL database. By default, Laravel 11 comes with a SQLite database. So it needs to take several next steps to replace the database.
 
