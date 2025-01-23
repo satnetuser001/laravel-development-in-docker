@@ -76,7 +76,7 @@ docker compose --profile delete-development-environment down
 Development directory is "laravel-development". Open this directory in your IDE to start development. To see the result open in the browser "localhost:8080".  
 To see the phpMyAdmin page open in the browser "localhost:8090". Use "root" for the Username and value from the file "secrets/mysql_root_password.txt" for the Password.
 
-Setting up a connection between Laravel and MySQL database. By default, Laravel comes with a SQLite database. So it needs to take several next steps to replace the database.
+Setting up a connection between Laravel and MySQL database. By default, Laravel 11 comes with a SQLite database. So it needs to take several next steps to replace the database.
 
 Attach to the artisan container:  
 ```bash
@@ -105,14 +105,36 @@ In the artisan container make a migration for the MySQL database:
 php artisan migrate
 ```
 
-### Step 3 - build an image from a finished project.  
-will be ...
+### Step 3 - build an application image after finishing development.
+It is supposed that the production environment architecture is similar to the development environment.
 
-#### Other  
+Prepare your Laravel application for deployment according to the [documentation](https://laravel.com/docs/11.x/deployment).
+Set environment variables in "config" directory and ".env" file for production.
+
+To build an image for a production environment, exec in the root directory of the project:
+```bash
+docker build --tag your-docker-hub-name/image-name:latest --file ./build-app/php-fpm.Dockerfile .
+```
+Note: replace "your-docker-hub-name" and "image-name" on yours.
+
+If you want to build a stand-alone container from your application, exec in the root directory of the project:
+```bash
+docker build --tag image-name:latest --file ./build-app/artisan.Dockerfile .
+```
+Note: make sure the database files, such as SQLite, are located within the application.  
+Note: an image built on "artisan.Dockerfile" will have only SQLite DBMS, so you need to add the required DBMS to "artisan.Dockerfile" if needed.
+
+#### Other
+Recreate the Laravel application using the existing composer container.
+!Warning! All data in "laravel-development" directory will be deleted and replaced with the new Laravel project!
+```bash
+docker container start composer
+```
 Restart php-fpm container after replacing index.php file.  
 ```bash
 docker restart php-fpm
 ```
 
-CUID=$(id -u) CGID=$(id -g) - describe what is this?
-Composer image not used because ...
+CUID=$(id -u) CGID=$(id -g) - setting in the image the name ID and group ID of the current user of the host system to set the correct owner for the application files.
+
+The composer image is not used because it doesn't work correctly with my internet provider.

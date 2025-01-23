@@ -17,7 +17,7 @@ RUN apt update && apt install -y \
     composer \
     && apt clean
 
-# create a working directory in container
+# set and create a working directory in image
 WORKDIR /app
 
 # remove the old directory and create Laravel project
