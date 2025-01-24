@@ -17,7 +17,7 @@ Block-diagram of development environment:
 +-----------------+                 V             V
 | php-fpm         |              +-----------------------+
 | container       |------------->| "laravel-development" |
-+-----------------+              | directory and         |
++-----------------+              | directory with        |
    |                             | SQLite files          |
    |   +----------------------+  | bind mount            |
    |   | phpmyadmin container |  +-----------------------+
@@ -76,7 +76,7 @@ docker compose --profile delete-development-environment down
 Development directory is "laravel-development". Open this directory in your IDE to start development. To see the result open in the browser [localhost:8080](http://localhost:8080).  
 To see the phpMyAdmin page open in the browser [localhost:8090](http://localhost:8090). Use "root" for the Username and value from the file "secrets/mysql_root_password.txt" for the Password.
 
-Setting up a connection between Laravel and MySQL database. By default, Laravel 11 comes with a SQLite database. So it needs to take several next steps to replace the database.
+Setting up a connection between Laravel and MySQL database. By default, Laravel 11 uses a SQLite database. So it needs to take several next steps to replace the database.
 
 Attach to the artisan container:  
 ```bash
@@ -89,7 +89,7 @@ In the artisan container make a rollback migration for the SQLite database:
 php artisan migrate:rollback
 ```
 
-In IDE edit ".env" file for MySQL database:
+In IDE edit "laravel-development/.env" file for MySQL database:
 <pre>
 DB_CONNECTION=mysql
 DB_HOST=mysql
@@ -105,7 +105,7 @@ In the artisan container make a migration for the MySQL database:
 php artisan migrate
 ```
 
-### Step 3 - build an application image after finishing development.
+### Step 3 - build a Laravel application image after finishing development.
 
 It is supposed that the production environment architecture is similar to the following block-diagram:
 <pre>
@@ -120,14 +120,14 @@ It is supposed that the production environment architecture is similar to the fo
 | port 80         |
 +-----------------+
    |                                          +---------------------------------+
-   |    +---------------+    +-----------+    | "laravel 1" database            |
-   |--->| Laravel app 1 |--->| mysql 1   |--->| laravel-production-mysql-data-1 |
+   |    +---------------+    +-----------+    | "laravel-1" database            |
+   |--->| Laravel-1 app |--->| mysql-1   |--->| laravel-production-mysql-data-1 |
    |    | container     |    | container |    | volume                          |
    .    +---------------+    +-----------+    +---------------------------------+
    .
    .                                          +---------------------------------+
-   |    +---------------+    +-----------+    | "laravel N" database            |
-   |--->| Laravel app N |--->| mysql N   |--->| laravel-production-mysql-data-N |
+   |    +---------------+    +-----------+    | "laravel-N" database            |
+   |--->| Laravel-N app |--->| mysql-N   |--->| laravel-production-mysql-data-N |
         | container     |    | container |    | volume                          |
         +---------------+    +-----------+    +---------------------------------+
 </pre>
@@ -145,20 +145,22 @@ If you want to build a stand-alone container from your application, exec in the 
 ```bash
 docker build --tag image-name:latest --file ./build-app/stand-alone.Dockerfile .
 ```
-Note: make sure the database files, such as SQLite, are located within the application.  
+Note: make sure that the database files, such as SQLite, are located within the application in "laravel-development" directory.  
 Note: an image built on "stand-alone.Dockerfile" will have only SQLite DBMS, so you need to add the required DBMS to "stand-alone.Dockerfile" if needed.
 
 #### Other
+
 Recreate the Laravel application using the existing composer container.  
 !Warning! All data in "laravel-development" directory will be deleted and replaced with the new Laravel application!
 ```bash
 docker container start composer
 ```
-Restart php-fpm container after replacing index.php file.  
+
+Restart php-fpm container after replacing "laravel-development/public/index.php" file.  
 ```bash
 docker restart php-fpm
 ```
 
-CUID=$(id -u) CGID=$(id -g) - setting in the image the name ID and group ID of the current user of the host system to set the correct owner for the application files:
+CUID=$(id -u) CGID=$(id -g) - setting in the images the name ID and group ID of the current user of the host system to set the correct owner for the application files.
 
-The composer image is not used because it doesn't work correctly with my internet provider.
+The composer image is not used because for some reason it doesn't work correctly with my internet provider.
