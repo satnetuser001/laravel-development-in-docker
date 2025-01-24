@@ -106,7 +106,31 @@ php artisan migrate
 ```
 
 ### Step 3 - build an application image after finishing development.
-It is supposed that the production environment architecture is similar to the development environment.
+
+It is supposed that the production environment architecture is similar to the following block-diagram:
+<pre>
++-----------------+
+| request from    |
+| client browser  |
++-----------------+
+         |
+         V
++-----------------+
+| nginx container |
+| port 80         |
++-----------------+
+   |                                          +---------------------------------+
+   |    +---------------+    +-----------+    | "laravel 1" database            |
+   |--->| Laravel app 1 |--->| mysql 1   |--->| laravel-production-mysql-data-1 |
+   |    | container     |    | container |    | volume                          |
+   .    +---------------+    +-----------+    +---------------------------------+
+   .
+   .                                          +---------------------------------+
+   |    +---------------+    +-----------+    | "laravel N" database            |
+   |--->| Laravel app N |--->| mysql N   |--->| laravel-production-mysql-data-N |
+        | container     |    | container |    | volume                          |
+        +---------------+    +-----------+    +---------------------------------+
+</pre>
 
 Prepare your Laravel application for deployment according to the [documentation](https://laravel.com/docs/11.x/deployment).  
 Set environment variables in "laravel-development/config" directory and "laravel-development/.env" file for production.
