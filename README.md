@@ -43,7 +43,7 @@ Pull this application from the GitHub repository:
 ```bash
 git clone https://github.com/satnetuser001/laravel-development-in-docker.git
 ```
-Rename the root directory "laravel-development-in-docker" to the name of your project, this is important because docker will use this name when building images.
+Rename the root directory "laravel-development-in-docker" to your project name. This is important because Docker will use this name when building images. Then, navigate to this directory.
 
 Optional step: for mysql database, change the root password in the file "secrets/mysql_root_password.txt". Exclude "secrets" directory from git commits in ".gitignore" file.
 
