@@ -1,5 +1,8 @@
+# build argument for PHP version
+ARG PHP_VERSION
+
 # base docker image
-FROM php:8.3.15-cli
+FROM php:${PHP_VERSION}cli
 
 # set and create a working directory in image
 WORKDIR /app

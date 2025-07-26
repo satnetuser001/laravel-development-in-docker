@@ -5,6 +5,10 @@ services:
     build:
       context: ./composer
       dockerfile: Dockerfile
+      args:
+        PHP_VERSION: ${PHP_VERSION:-}
+        COMPOSER_VERSION: ${COMPOSER_VERSION:+ --version=${COMPOSER_VERSION}}
+        LARAVEL_VERSION: ${LARAVEL_VERSION:+:${LARAVEL_VERSION}}
     user: ${CUID:-0}:${CGID:-0}
     environment:
       TZ: ${TZ}
@@ -23,6 +27,8 @@ services:
     build:
       context: ./artisan
       dockerfile: Dockerfile
+      args:
+        PHP_VERSION: ${PHP_VERSION:+${PHP_VERSION}-}
     user: ${CUID:-0}:${CGID:-0}
     restart: unless-stopped
     depends_on:
@@ -56,8 +62,13 @@ services:
     build:
       context: ./php-fpm
       dockerfile: Dockerfile
+      args:
+        PHP_VERSION: ${PHP_VERSION:+${PHP_VERSION}-}
+        XDEBUG_VERSION: ${XDEBUG_VERSION:+-${XDEBUG_VERSION}}
     user: ${CUID:-0}:${CGID:-0}
     restart: unless-stopped
+    environment:
+      PHP_IDE_CONFIG: "serverName=${IDE_SERVER_NAME:-laravel-development-in-docker}"
     depends_on:
       composer:
         condition: service_completed_successfully
@@ -66,8 +77,16 @@ services:
       - type: bind
         source: ./laravel-development
         target: /app
+      - type: bind
+        source: ./xdebug/xdebug.ini
+        target: /usr/local/etc/php/conf.d/xdebug.ini
+      - type: bind
+        source: ./xdebug/logs
+        target: /xdebug-logs
     networks:
       - laravel-development
+    extra_hosts:
+      host.docker.internal: host-gateway
 
   mysql:
     container_name: mysql
@@ -97,6 +116,24 @@ services:
       - mysql
     networks:
       - laravel-development
+
+  production:
+    build:
+      context: .
+      dockerfile: ./build-app/production.Dockerfile
+      args:
+        PHP_VERSION: ${PHP_VERSION:+${PHP_VERSION}-}
+    profiles:
+      - production
+
+  stand-alone:
+    build:
+      context: .
+      dockerfile: ./build-app/stand-alone.Dockerfile
+      args:
+        PHP_VERSION: ${PHP_VERSION:+${PHP_VERSION}-}
+    profiles:
+      - stand-alone
 
 secrets:
   mysql-root-password:

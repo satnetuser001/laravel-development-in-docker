@@ -16,11 +16,12 @@ Block-diagram of development environment:
          V                          |             |
 +-----------------+                 V             V
 | php-fpm         |              +-----------------------+
-| container       |------------->| "laravel-development" |
-+-----------------+              | directory with        |
-   |                             | SQLite files          |
-   |   +----------------------+  | bind mount            |
-   |   | phpmyadmin container |  +-----------------------+
+| with Xdebug     |------------->| "laravel-development" |
+| container       |              | directory with        |
++-----------------+              | SQLite files          |
+   |                             | bind mount            |
+   |   +----------------------+  +-----------------------+
+   |   | phpmyadmin container |
    |   | port 8090            |
    |   +----------------------+
    |        |
@@ -32,10 +33,10 @@ Block-diagram of development environment:
 </pre>
 
 System requirements:  
-linux kernel version 6.8.0-51-generic  
-docker engine version 27.5.0  
-docker compose version 2.32.3  
-unoccupied ports 8080 8090  
+linux kernel version 6.14.0-24-generic  
+docker engine version 28.3.2  
+docker compose version 2.38.2  
+unoccupied ports 8080 8090 9003  
 
 ### Step 1 - building development environment.
 
@@ -54,7 +55,7 @@ This is the default behavior and should be used in all standard cases.
 CUID=$(id -u) CGID=$(id -g) docker compose --profile create-project up -d
 ```
 
-If you need up only development containers:  
+If you need up only development containers without composer:  
 ```bash
 CUID=$(id -u) CGID=$(id -g) docker compose up -d
 ```
@@ -71,12 +72,50 @@ The "laravel-development" directory and volume with the laravel database will no
 docker compose --profile delete-development-environment down
 ```
 
-### Step 2 - development process.
+### Step 2 - setting up the PhpStorm connection to Xdebug running in a container.
 
-Development directory is "laravel-development". Open this directory in your IDE to start development. To see the result open in the browser [localhost:8080](http://localhost:8080).  
+In PhpStorm, configure the following settings:  
+- CLI interpreter:
+    - Main Menu → Settings or Ctrl+Alt+S
+    - PHP → CLI Interpreter
+    - Click "..."
+    - Click "+"
+    - Select "From Docker, Vagrant, VM, WSL, Remote..."
+    - Select "Docker Compose"
+    - For "Configuration files" select "./compose.yaml"
+    - For "Service" select "php-fpm"
+    - Click "OK"
+    - Click "OK"
+- PHP server:
+    - Main Menu → Settings or Ctrl+Alt+S
+    - PHP → Servers
+    - Click "+"
+    - Fill in the fields:
+        - Name: "laravel-development-in-docker"
+        - Host: "localhost"
+        - Port: "8080"
+        - Debugger: "Xdebug"
+    - Check "Use path mappings"
+    - In mapping settings specify:
+        - File/Directory: absolute path to "laravel-development" directory in your project
+        - Absolute path on the server: "/app"
+    - Click "OK"  
+
+In browser, install "Xdebug Helper by JetBrains" extension and enable Debug mode (green bug icon in toolbar).  
+
+Xdebug settings are stored in "./xdebug/xdebug.ini".  
+Restart php-fpm container after changing settings:
+```bash
+docker restart php-fpm
+```
+Xdebug logs are saved to "./xdebug/logs" folder.
+
+### Step 3 - development process.
+
+Development directory is "laravel-development". Open this directory in IDE to start development. To see the result open in the browser [localhost:8080](http://localhost:8080).  
 To see the phpMyAdmin page open in the browser [localhost:8090](http://localhost:8090). Use "root" for the Username and value from the file "secrets/mysql_root_password.txt" for the Password.
 
-Setting up a connection between Laravel and MySQL database. By default, Laravel 11 uses a SQLite database. So it needs to take several next steps to replace the database.
+Setting up a connection between Laravel and MySQL database. By default, the latest versions of Laravel use an SQLite database. So it needs to take several next steps to replace the database.
 
 Attach to the artisan container:  
 ```bash
@@ -105,7 +144,7 @@ In the artisan container make a migration for the MySQL database:
 php artisan migrate
 ```
 
-### Step 3 - build a Laravel application image after finishing development.
+### Step 4 - build a Laravel application image after finishing development.
 
 It is supposed that the production environment architecture is similar to the following block-diagram:
 <pre>
@@ -132,21 +171,21 @@ It is supposed that the production environment architecture is similar to the fo
         +---------------+    +-----------+    +---------------------------------+
 </pre>
 
-Prepare your Laravel application for deployment according to the [documentation](https://laravel.com/docs/11.x/deployment).  
+Prepare your Laravel application for deployment according to the [documentation](https://laravel.com/docs/12.x/deployment).  
 Set environment variables in "laravel-development/config" directory and "laravel-development/.env" file for production.
 
 To build an image for a production environment, exec in the root directory of the project:
 ```bash
-docker build --tag your-docker-hub-name/image-name:latest --file ./build-app/production.Dockerfile .
+docker compose build production
 ```
-Note: replace "your-docker-hub-name" and "image-name" on yours.
+Note: remember to rename the built image before push.
 
 If you want to build a stand-alone container from your application, exec in the root directory of the project:
 ```bash
-docker build --tag image-name:latest --file ./build-app/stand-alone.Dockerfile .
+docker compose build stand-alone
 ```
-Note: make sure that the database files, such as SQLite, are located within the application in "laravel-development" directory.  
-Note: an image built on "stand-alone.Dockerfile" will have only SQLite DBMS, so you need to add the required DBMS to "stand-alone.Dockerfile" if needed.
+Note: make sure that the database files, such as SQLite, are located within the application in the "laravel-development" directory.  
+Note: an image built on "./build-app/stand-alone.Dockerfile" will have only SQLite DBMS, so you need to add the required DBMS to "./build-app/stand-alone.Dockerfile" if needed.
 
 #### Other
 
@@ -156,7 +195,7 @@ Recreate the Laravel application using the existing composer container.
 docker container start composer
 ```
 
-Restart php-fpm container after replacing "laravel-development/public/index.php" file.  
+Restart php-fpm container after replacing "laravel-development/public/index.php" file:  
 ```bash
 docker restart php-fpm
 ```
