@@ -71,10 +71,9 @@ The "laravel-development" directory and volume with the laravel database will no
 ```bash
 docker compose --profile delete-development-environment down
 ```
-
-### Step 2 - setting up the PhpStorm connection to Xdebug running in a container.
-
-In PhpStorm, configure the following settings:  
+  
+### Step 2 - setting up the PhpStorm connection to Xdebug running in a container.  
+Open the root directory of the project in PhpStorm, and configure the following settings:  
 - CLI interpreter:
     - Main Menu → Settings or Ctrl+Alt+S
     - PHP → CLI Interpreter
@@ -108,11 +107,11 @@ Restart php-fpm container after changing settings:
 ```bash
 docker restart php-fpm
 ```
-Xdebug logs are saved to "./xdebug/logs" folder.
+Xdebug logs are saved to "./xdebug/logs" folder.  
 
 ### Step 3 - development process.
 
-Development directory is "laravel-development". Open this directory in IDE to start development. To see the result open in the browser [localhost:8080](http://localhost:8080).  
+Development directory is "laravel-development". Feel free to create something incredible!) To see the result open in the browser [localhost:8080](http://localhost:8080).  
 To see the phpMyAdmin page open in the browser [localhost:8090](http://localhost:8090). Use "root" for the Username and value from the file "secrets/mysql_root_password.txt" for the Password.
 
 Setting up a connection between Laravel and MySQL database. By default, the latest versions of Laravel use an SQLite database. So it needs to take several next steps to replace the database.
