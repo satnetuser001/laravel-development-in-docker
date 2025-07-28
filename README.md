@@ -46,7 +46,7 @@ git clone https://github.com/satnetuser001/laravel-development-in-docker.git
 ```
 Rename the root directory "laravel-development-in-docker" to your project name. This is important because Docker will use this name when building images. Then, navigate to this directory.
 
-Optional step: for mysql database, change the root password in the file "secrets/mysql_root_password.txt". Exclude "secrets" directory from git commits in ".gitignore" file.
+Optional step: specify the required versions of PHP, Xdebug, Composer, and Laravel in the .env file, otherwise, the latest versions will be used. For the MySQL database, change the root password in the secrets/mysql_root_password.txt file. Exclude the secrets directory from Git commits by adding it to the .gitignore file.
 
 Up all development containers with composer create-project.  
 This is the default behavior and should be used in all standard cases.  
@@ -76,18 +76,12 @@ docker compose --profile delete-development-environment down
 Open the root directory of the project in PhpStorm, and configure the following settings:  
 - CLI interpreter:
     - Main Menu → Settings or Ctrl+Alt+S
-    - PHP → CLI Interpreter
-    - Click "..."
-    - Click "+"
-    - Select "From Docker, Vagrant, VM, WSL, Remote..."
-    - Select "Docker Compose"
-    - For "Configuration files" select "./compose.yaml"
-    - For "Service" select "php-fpm"
-    - Click "OK"
-    - Click "OK"
+    - PHP → CLI Interpreter → Click "..."
+    - Click "+" → Select "From Docker, Vagrant, VM, WSL, Remote..." → Check "Docker Compose"
+    - For "Configuration files" select "./compose.yaml", for "Service" select "php-fpm"
+    - Click "OK" twice
 - PHP server:
-    - Main Menu → Settings or Ctrl+Alt+S
-    - PHP → Servers
+    - Expand the PHP section → Select "Servers"
     - Click "+"
     - Fill in the fields:
         - Name: "laravel-development-in-docker"
@@ -102,12 +96,12 @@ Open the root directory of the project in PhpStorm, and configure the following 
 
 In browser, install "Xdebug Helper by JetBrains" extension and enable Debug mode (green bug icon in toolbar).  
 
-Xdebug settings are stored in "./xdebug/xdebug.ini".  
+Xdebug settings are stored in "xdebug/xdebug.ini".  
 Restart php-fpm container after changing settings:
 ```bash
 docker restart php-fpm
 ```
-Xdebug logs are saved to "./xdebug/logs" folder.  
+Xdebug logs are saved to "xdebug/logs" folder.  
 
 ### Step 3 - development process.
 
@@ -127,7 +121,7 @@ In the artisan container make a rollback migration for the SQLite database:
 php artisan migrate:rollback
 ```
 
-In IDE edit "laravel-development/.env" file for MySQL database:
+In PhpStorm edit "laravel-development/.env" file for MySQL database:
 <pre>
 DB_CONNECTION=mysql
 DB_HOST=mysql
@@ -170,7 +164,7 @@ It is supposed that the production environment architecture is similar to the fo
         +---------------+    +-----------+    +---------------------------------+
 </pre>
 
-Prepare your Laravel application for deployment according to the [documentation](https://laravel.com/docs/12.x/deployment).  
+Prepare your Laravel application for deployment according to the [documentation](https://laravel.com/docs/deployment).  
 Set environment variables in "laravel-development/config" directory and "laravel-development/.env" file for production.
 
 To build an image for a production environment, exec in the root directory of the project:
@@ -184,7 +178,7 @@ If you want to build a stand-alone container from your application, exec in the 
 docker compose build stand-alone
 ```
 Note: make sure that the database files, such as SQLite, are located within the application in the "laravel-development" directory.  
-Note: an image built on "./build-app/stand-alone.Dockerfile" will have only SQLite DBMS, so you need to add the required DBMS to "./build-app/stand-alone.Dockerfile" if needed.
+Note: a stand-alone application image will have only SQLite DBMS, so you need to add the required DBMS to "build-app/stand-alone.Dockerfile" if needed.
 
 #### Other
 
